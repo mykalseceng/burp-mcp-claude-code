@@ -44,27 +44,29 @@ npm run build
 
 ### 4. Configure Claude Code
 
-Add the following to your `~/.claude.json` (create if it doesn't exist):
+Run from the repository root:
 
-```json
-{
-  "mcpServers": {
-    "burp": {
-      "command": "node",
-      "args": ["/absolute/path/to/burpmcp/mcp-server/dist/index.js"],
-      "env": {
-        "BURP_WS_URL": "ws://localhost:8198"
-      }
-    }
-  }
-}
+```bash
+claude mcp add burp -- node /absolute/path/to/burpmcp/mcp-server/dist/index.js
+```
+
+Or with the WebSocket URL explicitly set:
+
+```bash
+claude mcp add burp -e BURP_WS_URL=ws://localhost:8198 -- node /absolute/path/to/burpmcp/mcp-server/dist/index.js
 ```
 
 Replace `/absolute/path/to/burpmcp` with the actual path to this repository.
 
+To verify it was added:
+
+```bash
+claude mcp list
+```
+
 ### 5. Restart Claude Code
 
-After updating the configuration, restart Claude Code to load the new MCP server.
+After adding the MCP server, restart Claude Code to load it.
 
 ## Available Tools
 

@@ -102,19 +102,8 @@ Stored via Burp preferences:
 - `burpmcp.max.body.size` - Max body size (default: 100KB)
 
 ### Claude Code Config
-Add to `~/.claude.json`:
-```json
-{
-  "mcpServers": {
-    "burp": {
-      "command": "node",
-      "args": ["/path/to/burpmcp/mcp-server/dist/index.js"],
-      "env": {
-        "BURP_WS_URL": "ws://localhost:8198"
-      }
-    }
-  }
-}
+```bash
+claude mcp add burp -- node /path/to/burpmcp/mcp-server/dist/index.js
 ```
 
 ## Implementation Status
