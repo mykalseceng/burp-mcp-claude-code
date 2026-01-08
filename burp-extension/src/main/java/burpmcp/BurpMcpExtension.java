@@ -7,6 +7,7 @@ import burpmcp.traffic.TrafficStore;
 import burpmcp.traffic.TrafficHttpHandler;
 import burpmcp.websocket.WebSocketServer;
 import burpmcp.websocket.MessageHandler;
+import burpmcp.rpc.methods.*;
 
 public class BurpMcpExtension implements BurpExtension {
     private MontoyaApi api;
@@ -32,10 +33,15 @@ public class BurpMcpExtension implements BurpExtension {
 
         // Phase 3: Start WebSocket server
         this.messageHandler = new MessageHandler();
-        // Phase 4: Register RPC methods here
-        // messageHandler.registerMethod(new GetProxyHistory(trafficStore));
-        // messageHandler.registerMethod(new GetSitemap(api));
-        // etc.
+
+        // Phase 4: Register RPC methods
+        messageHandler.registerMethod(new GetProxyHistory(trafficStore));
+        messageHandler.registerMethod(new GetSitemap(api));
+        messageHandler.registerMethod(new SendRequest(api));
+        messageHandler.registerMethod(new TriggerScan(api));
+        messageHandler.registerMethod(new GetScope(api));
+        messageHandler.registerMethod(new ModifyScope(api));
+        api.logging().logToOutput("Registered 6 RPC methods");
 
         this.wsServer = new WebSocketServer(
             config.getWebSocketPort(),
