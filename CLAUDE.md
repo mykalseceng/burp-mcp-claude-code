@@ -13,17 +13,11 @@ Claude Code CLI  ←(stdio)→  MCP Server (TypeScript)  ←(WebSocket)→  Burp
 
 ## Build Commands
 
-### Quick Build (from repo root)
-```bash
-# Build Burp Extension
-cd burp-extension && ./gradlew build && cd ..
-```
-
 ### Java Burp Extension
 ```bash
 cd burp-extension
 ./gradlew build              # Build JAR → build/libs/burp-mcp-extension-1.0.0.jar
-./gradlew clean              # Clean build artifacts
+./gradlew clean build        # Clean rebuild
 ```
 Requires Java 21+.
 
@@ -37,11 +31,21 @@ npm start                   # Run compiled version
 ```
 Requires Node.js 18+.
 
+### Testing WebSocket Connection
+```bash
+# Install wscat globally if needed
+npm install -g wscat
+
+# Connect and test RPC
+wscat -c ws://localhost:8198
+> {"jsonrpc":"2.0","id":"1","method":"get_proxy_history","params":{"domain":"example.com","limit":5}}
+```
+
 ## Project Structure
 
 ```
 burpmcp/
-├── IMPLEMENTATION_PLAN.md    # 7-phase implementation roadmap (START HERE)
+├── IMPLEMENTATION_PLAN.md    # 7-phase roadmap with complete code templates
 ├── burp-extension/           # Java Burp Suite extension
 │   └── src/main/java/burpmcp/
 │       ├── BurpMcpExtension.java    # Extension entry point
@@ -50,15 +54,13 @@ burpmcp/
 │       ├── websocket/                # WebSocket server & message handling
 │       ├── rpc/                      # JSON-RPC DTOs & method implementations
 │       └── util/                     # JSON utilities, serialization
-├── mcp-server/               # TypeScript MCP server
-│   └── src/
-│       ├── index.ts                  # Entry point
-│       ├── server.ts                 # MCP server setup
-│       ├── burp-client.ts            # WebSocket client to Burp
-│       ├── tools/                    # MCP tool implementations
-│       └── types/                    # TypeScript type definitions
-└── protocol/
-    └── PROTOCOL.md           # Shared JSON-RPC specification
+└── mcp-server/               # TypeScript MCP server
+    └── src/
+        ├── index.ts                  # Entry point
+        ├── server.ts                 # MCP server setup
+        ├── burp-client.ts            # WebSocket client to Burp
+        ├── tools/                    # MCP tool implementations
+        └── types/                    # TypeScript type definitions
 ```
 
 ## Architecture
@@ -82,27 +84,13 @@ All communication uses JSON-RPC 2.0 between MCP Server and Burp Extension over W
 
 **WebSocketServer (Java)** - Manages client connections and routes JSON-RPC messages to RpcMethod handlers.
 
-**BurpClient (TypeScript)** - WebSocket client with Promise-based RPC calls and timeout handling.
+**BurpClient (TypeScript)** - WebSocket client with Promise-based RPC calls, timeout handling, and automatic reconnection.
 
 ### Design Patterns
 - Builder Pattern for immutable `StoredRequest` objects
 - Thread-safe collections (ConcurrentHashMap, ConcurrentLinkedDeque)
 - Handler Pattern for traffic interception
 - Zod schemas for TypeScript request validation
-
-## Implementation Phases
-
-The project follows a 7-phase implementation roadmap in `IMPLEMENTATION_PLAN.md`:
-
-```
-Phase 1 (Foundation) → Phase 2 (Traffic) → Phase 3 (WebSocket) → Phase 4 (RPC Methods)
-                                                                          ↓
-Phase 5 (MCP Server) ←──────────────────────────────────────────── can parallelize
-         ↓
-Phase 6 (MCP Tools) → Phase 7 (Integration)
-```
-
-**Phase 1 must complete first** - establishes Gradle build and extension entry point.
 
 ## Configuration
 
@@ -129,6 +117,13 @@ Add to `~/.claude.json`:
 }
 ```
 
+## Implementation Status
+
+**Phases 1-6: Complete** - Core functionality implemented.
+**Phase 7: Ready** - Integration testing and polish.
+
+See `IMPLEMENTATION_PLAN.md` for complete code templates and detailed implementation guides for each phase.
+
 ## Key Dependencies
 
 ### Java
@@ -147,4 +142,4 @@ Add to `~/.claude.json`:
 - **Thread safety is critical** - Java traffic store must use concurrent collections
 - **Body truncation** - Large HTTP bodies truncated at 100KB to prevent memory issues
 - **Burp Pro required** for `trigger_scan` functionality
-- **JSON-RPC error codes** - Use standardized ranges from protocol specification
+- **JSON-RPC error codes** - Standard codes: -32700 (parse), -32600 (invalid request), -32601 (method not found), -32602 (invalid params), -32603 (internal); Custom codes: -32001 (Pro required), -32002 (not in scope), -32003 (timeout)
