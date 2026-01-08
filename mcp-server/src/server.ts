@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { BurpClient } from './burp-client.js';
+import { registerAllTools } from './tools/index.js';
 
 export async function createServer(burpClient: BurpClient): Promise<McpServer> {
   const server = new McpServer({
@@ -8,7 +9,7 @@ export async function createServer(burpClient: BurpClient): Promise<McpServer> {
     version: '1.0.0'
   });
 
-  // Phase 6: Register tools here
+  registerAllTools(server, burpClient);
 
   return server;
 }
