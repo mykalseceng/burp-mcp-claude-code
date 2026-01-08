@@ -1,0 +1,40 @@
+# Java / Gradle
+burp-extension/.gradle/
+burp-extension/build/
+burp-extension/bin/
+burp-extension/*.jar
+*.class
+.gradle/
+build/
+
+# Node.js / TypeScript
+mcp-server/node_modules/
+mcp-server/dist/
+mcp-server/*.tgz
+node_modules/
+dist/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Test coverage
+coverage/
+.nyc_output/
