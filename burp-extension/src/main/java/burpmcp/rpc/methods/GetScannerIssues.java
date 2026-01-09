@@ -36,11 +36,9 @@ public class GetScannerIssues implements RpcMethod {
         String severityFilter = params.has("severity") ? params.get("severity").getAsString().toUpperCase() : null;
 
         List<AuditIssue> allIssues = api.siteMap().issues();
-        List<Map<String, Object>> issues = new ArrayList<>();
 
-        int count = 0;
-        int skipped = 0;
-
+        // First pass: collect all issues matching filters
+        List<AuditIssue> filteredIssues = new ArrayList<>();
         for (AuditIssue issue : allIssues) {
             // Apply URL filter if specified
             if (urlFilter != null && !issue.baseUrl().contains(urlFilter)) {
@@ -52,24 +50,21 @@ public class GetScannerIssues implements RpcMethod {
                 continue;
             }
 
-            // Handle offset
-            if (skipped < offset) {
-                skipped++;
-                continue;
-            }
+            filteredIssues.add(issue);
+        }
 
-            // Check limit
-            if (count >= limit) {
-                break;
-            }
+        // Second pass: apply pagination to filtered results
+        List<Map<String, Object>> issues = new ArrayList<>();
+        int filteredTotal = filteredIssues.size();
+        int end = Math.min(offset + limit, filteredTotal);
 
-            issues.add(serializeIssue(issue));
-            count++;
+        for (int i = offset; i < end; i++) {
+            issues.add(serializeIssue(filteredIssues.get(i)));
         }
 
         Map<String, Object> result = new HashMap<>();
         result.put("issues", issues);
-        result.put("total", allIssues.size());
+        result.put("total", filteredTotal);
         result.put("returned", issues.size());
         result.put("offset", offset);
 
