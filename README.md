@@ -1,6 +1,8 @@
 # BurpMCP
 
-BurpMCP enables Claude Code CLI to orchestrate Burp Suite through an MCP (Model Context Protocol) server. It bridges Claude and Burp Suite for AI-powered analysis of HTTP traffic, sending requests, accessing sitemaps, and triggering security scans.
+BurpMCP connects Claude Code to Burp Suite, combining source code analysis with live HTTP traffic inspection. Claude Code already understands your codebase—now it can see actual requests and responses flowing through Burp's proxy, correlate code with runtime behavior, and craft targeted security tests.
+
+Built on MCP (Model Context Protocol), BurpMCP enables Claude to analyze captured traffic, send custom requests, explore sitemaps, and trigger vulnerability scans.
 
 ## Why This Architecture?
 
