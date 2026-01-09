@@ -12,16 +12,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class TriggerScan implements RpcMethod {
+public class StartScan implements RpcMethod {
     private final MontoyaApi api;
 
-    public TriggerScan(MontoyaApi api) {
+    public StartScan(MontoyaApi api) {
         this.api = api;
     }
 
     @Override
     public String getName() {
-        return "trigger_scan";
+        return "start_scan";
     }
 
     @Override

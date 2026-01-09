@@ -3,16 +3,16 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { BurpClient } from '../burp-client.js';
 import { ScanResult } from '../types/burp.js';
 
-export function registerTriggerScan(server: McpServer, client: BurpClient): void {
+export function registerStartScan(server: McpServer, client: BurpClient): void {
   server.tool(
-    'trigger_scan',
+    'start_scan',
     'Start an active vulnerability scan on a URL (Burp Professional only)',
     {
       url: z.string().url().describe('URL to scan'),
       crawl: z.boolean().optional().default(false).describe('Crawl before scanning')
     },
     async (params) => {
-      const result = await client.call<ScanResult>('trigger_scan', params);
+      const result = await client.call<ScanResult>('start_scan', params);
 
       return {
         content: [{
