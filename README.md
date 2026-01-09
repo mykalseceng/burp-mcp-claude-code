@@ -77,7 +77,7 @@ Once configured, the following tools are available in Claude Code:
 | `get_proxy_history` | Query HTTP requests/responses captured by Burp proxy for a specific domain |
 | `get_sitemap` | Get discovered endpoints from Burp's site map |
 | `send_request` | Send a custom HTTP request through Burp Suite |
-| `trigger_scan` | Start an active vulnerability scan (Burp Professional only) |
+| `start_scan` | Start an active vulnerability scan (Burp Professional only) |
 | `get_scope` | Get the current Burp Suite scope configuration |
 | `modify_scope` | Add or remove a URL from Burp's scope |
 
@@ -161,7 +161,7 @@ The extension stores settings via Burp preferences:
 
 ### Scan Features Not Working
 
-The `trigger_scan` tool requires Burp Suite Professional. On Community Edition, it will return an error indicating Pro is required.
+The `start_scan` tool requires Burp Suite Professional. On Community Edition, it will return an error indicating Pro is required.
 
 ## Development
 

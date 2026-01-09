@@ -38,3 +38,7 @@ logs/
 # Test coverage
 coverage/
 .nyc_output/
+
+# Local Claude Code files
+CLAUDE.md
+IMPLEMENTATION_PLAN.md
