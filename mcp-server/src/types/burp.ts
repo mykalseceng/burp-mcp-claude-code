@@ -45,4 +45,14 @@ export interface ScanResult {
   scanId: string;
   status: string;
   message: string;
+  crawlEnabled?: boolean;
+}
+
+export interface StopScanResult {
+  scanId: string;
+  stopped: boolean;
+  crawlStopped: boolean;
+  auditStopped: boolean;
+  targetUrl: string;
+  message: string;
 }

@@ -4,6 +4,7 @@ import { registerGetProxyHistory } from './get-proxy-history.js';
 import { registerGetSitemap } from './get-sitemap.js';
 import { registerSendRequest } from './send-request.js';
 import { registerTriggerScan } from './trigger-scan.js';
+import { registerStopScan } from './stop-scan.js';
 import { registerGetScope, registerModifyScope } from './get-scope.js';
 
 export function registerAllTools(server: McpServer, client: BurpClient): void {
@@ -11,6 +12,7 @@ export function registerAllTools(server: McpServer, client: BurpClient): void {
   registerGetSitemap(server, client);
   registerSendRequest(server, client);
   registerTriggerScan(server, client);
+  registerStopScan(server, client);
   registerGetScope(server, client);
   registerModifyScope(server, client);
 }
