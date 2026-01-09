@@ -133,6 +133,7 @@ Once configured, the following tools are available in Claude Code:
 | `get_scanner_issues` | Get vulnerability findings from Burp's scanner (Burp Professional only) |
 | `get_scope` | Get the current Burp Suite scope configuration |
 | `modify_scope` | Add or remove a URL from Burp's scope |
+| `send_to_repeater` | Send an HTTP request to Burp Repeater for manual testing |
 
 ## Usage Examples
 
