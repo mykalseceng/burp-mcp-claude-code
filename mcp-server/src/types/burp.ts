@@ -39,6 +39,7 @@ export interface SendRequestResult {
   headers: Record<string, string>;
   body: string;
   time: number;
+  addedToSiteMap: boolean;
 }
 
 export interface ScanResult {
