@@ -129,6 +129,8 @@ Once configured, the following tools are available in Claude Code:
 | `get_sitemap` | Get discovered endpoints from Burp's site map |
 | `send_request` | Send a custom HTTP request through Burp Suite |
 | `start_scan` | Start an active vulnerability scan (Burp Professional only) |
+| `stop_scan` | Stop a running scan by ID (Burp Professional only) |
+| `get_scanner_issues` | Get vulnerability findings from Burp's scanner (Burp Professional only) |
 | `get_scope` | Get the current Burp Suite scope configuration |
 | `modify_scope` | Add or remove a URL from Burp's scope |
 
