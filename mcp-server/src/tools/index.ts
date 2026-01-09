@@ -6,6 +6,7 @@ import { registerSendRequest } from './send-request.js';
 import { registerTriggerScan } from './trigger-scan.js';
 import { registerStopScan } from './stop-scan.js';
 import { registerGetScope, registerModifyScope } from './get-scope.js';
+import { registerGetScannerIssues } from './get-scanner-issues.js';
 
 export function registerAllTools(server: McpServer, client: BurpClient): void {
   registerGetProxyHistory(server, client);
@@ -15,4 +16,5 @@ export function registerAllTools(server: McpServer, client: BurpClient): void {
   registerStopScan(server, client);
   registerGetScope(server, client);
   registerModifyScope(server, client);
+  registerGetScannerIssues(server, client);
 }
