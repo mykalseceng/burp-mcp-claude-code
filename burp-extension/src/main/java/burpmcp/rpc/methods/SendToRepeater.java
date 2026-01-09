@@ -29,12 +29,15 @@ public class SendToRepeater implements RpcMethod {
         boolean https = !params.has("https") || params.get("https").getAsBoolean();
         String tabName = params.has("tabName") ? params.get("tabName").getAsString() : null;
 
-        if (requestContent == null || host == null) {
-            throw new RpcException(RpcException.INVALID_PARAMS, "request and host parameters required");
+        if (requestContent == null || requestContent.isEmpty()) {
+            throw new RpcException(RpcException.INVALID_PARAMS, "request parameter required");
+        }
+        if (host == null || host.isEmpty()) {
+            throw new RpcException(RpcException.INVALID_PARAMS, "host parameter required");
         }
 
-        // Normalize line endings (LF to CRLF)
-        String normalizedRequest = requestContent.replace("\r", "").replace("\n", "\r\n");
+        // Normalize line endings (LF to CRLF for HTTP protocol)
+        String normalizedRequest = requestContent.replace("\r\n", "\n").replace("\n", "\r\n");
 
         HttpService service = HttpService.httpService(host, port, https);
         HttpRequest request = HttpRequest.httpRequest(service, normalizedRequest);
