@@ -1,6 +1,8 @@
 package burpmcp.rpc.methods;
 
 import burp.api.montoya.MontoyaApi;
+import burp.api.montoya.core.Annotations;
+import burp.api.montoya.core.HighlightColor;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.http.message.HttpHeader;
@@ -33,6 +35,8 @@ public class SendRequest implements RpcMethod {
 
         String method = params.has("method") ? params.get("method").getAsString() : "GET";
         String body = params.has("body") ? params.get("body").getAsString() : "";
+        boolean addToSiteMap = params.has("addToSiteMap") && params.get("addToSiteMap").getAsBoolean();
+        String source = params.has("source") ? params.get("source").getAsString() : "Claude Code";
 
         HttpRequest request = HttpRequest.httpRequestFromUrl(url).withMethod(method);
 
@@ -51,11 +55,25 @@ public class SendRequest implements RpcMethod {
         HttpRequestResponse response = api.http().sendRequest(request);
         long duration = System.currentTimeMillis() - startTime;
 
+        if (response.response() == null) {
+            throw new RpcException(RpcException.INTERNAL_ERROR, "Request failed: no response received");
+        }
+
+        if (addToSiteMap) {
+            Annotations annotations = Annotations.annotations(
+                "Source: " + source,
+                HighlightColor.CYAN
+            );
+            HttpRequestResponse annotatedResponse = response.withAnnotations(annotations);
+            api.siteMap().add(annotatedResponse);
+        }
+
         Map<String, Object> result = new HashMap<>();
         result.put("statusCode", response.response().statusCode());
         result.put("headers", headersToMap(response.response().headers()));
         result.put("body", response.response().bodyToString());
         result.put("time", duration);
+        result.put("addedToSiteMap", addToSiteMap);
 
         return result;
     }

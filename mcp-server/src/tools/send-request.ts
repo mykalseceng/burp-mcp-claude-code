@@ -12,15 +12,19 @@ export function registerSendRequest(server: McpServer, client: BurpClient): void
       method: z.string().optional().default('GET').describe('HTTP method'),
       headers: z.record(z.string()).optional().describe('Request headers'),
       body: z.string().optional().describe('Request body'),
-      followRedirects: z.boolean().optional().default(false).describe('Follow redirects')
+      followRedirects: z.boolean().optional().default(false).describe('Follow redirects'),
+      addToSiteMap: z.boolean().optional().default(false).describe('Add request/response to Burp Site Map'),
+      source: z.string().optional().default('Claude Code').describe('Source identifier for the request (shown in Site Map annotations)')
     },
     async (params) => {
       const result = await client.call<SendRequestResult>('send_request', params);
 
+      const siteMapInfo = result.addedToSiteMap ? `\nAdded to Site Map: Yes (Source: ${params.source || 'Claude Code'})` : '';
+
       return {
         content: [{
           type: 'text',
-          text: `Status: ${result.statusCode}\nTime: ${result.time}ms\n\nHeaders:\n${JSON.stringify(result.headers, null, 2)}\n\nBody:\n${result.body}`
+          text: `Status: ${result.statusCode}\nTime: ${result.time}ms${siteMapInfo}\n\nHeaders:\n${JSON.stringify(result.headers, null, 2)}\n\nBody:\n${result.body}`
         }]
       };
     }
