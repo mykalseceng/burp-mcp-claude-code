@@ -92,3 +92,11 @@ export interface ScannerIssuesResult {
   returned: number;
   offset: number;
 }
+
+export interface SendToIntruderResult {
+  success: boolean;
+  message: string;
+  host?: string;
+  port?: number;
+  https?: boolean;
+}

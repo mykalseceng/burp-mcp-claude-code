@@ -128,6 +128,7 @@ Once configured, the following tools are available in Claude Code:
 | `get_proxy_history` | Query HTTP requests/responses captured by Burp proxy for a specific domain |
 | `get_sitemap` | Get discovered endpoints from Burp's site map |
 | `send_request` | Send a custom HTTP request through Burp Suite |
+| `send_to_intruder` | Send an HTTP request to Burp Intruder for fuzzing/brute-force attacks |
 | `start_scan` | Start an active vulnerability scan (Burp Professional only) |
 | `stop_scan` | Stop a running scan by ID (Burp Professional only) |
 | `get_scanner_issues` | Get vulnerability findings from Burp's scanner (Burp Professional only) |
