@@ -2,11 +2,62 @@
 
 BurpMCP enables Claude Code CLI to orchestrate Burp Suite through an MCP (Model Context Protocol) server. It bridges Claude and Burp Suite for AI-powered analysis of HTTP traffic, sending requests, accessing sitemaps, and triggering security scans.
 
+## Why This Architecture?
+
+Claude Code cannot directly interact with Burp Suite for several reasons:
+
+1. **No Native Burp API Access** - Burp Suite runs as a standalone Java application with its own extension API. Claude Code has no way to call Java methods or access Burp's internal state directly.
+
+2. **Process Isolation** - Claude Code runs in its own process and communicates with the outside world through MCP (Model Context Protocol). It cannot spawn or control GUI applications like Burp Suite.
+
+3. **Different Runtime Environments** - Claude Code's MCP servers run in Node.js, while Burp extensions must be written in Java/Kotlin. A bridge is needed to connect these two worlds.
+
+The solution is a two-component bridge architecture that translates between Claude Code's MCP protocol and Burp Suite's extension API.
+
 ## Architecture
 
 ```
-Claude Code CLI  <--(stdio)-->  MCP Server (TypeScript)  <--(WebSocket)-->  Burp Extension (Java)
+┌─────────────────┐      stdio       ┌─────────────────┐    WebSocket    ┌─────────────────┐
+│                 │    (JSON-RPC)    │                 │   (JSON-RPC)    │                 │
+│  Claude Code    │◄────────────────►│   MCP Server    │◄───────────────►│ Burp Extension  │
+│     CLI         │                  │  (TypeScript)   │                 │     (Java)      │
+│                 │                  │                 │                 │                 │
+└─────────────────┘                  └─────────────────┘                 └─────────────────┘
+                                            │                                    │
+                                            │                                    │
+                                     Translates MCP              Accesses Burp's Montoya API
+                                     tool calls to               for proxy history, sitemap,
+                                     WebSocket RPC               scanning, and HTTP requests
 ```
+
+### Component Responsibilities
+
+#### MCP Server (TypeScript)
+
+The MCP server acts as a translator between Claude Code and Burp Suite:
+
+- **Speaks MCP Protocol** - Communicates with Claude Code over stdio using the Model Context Protocol, exposing tools that Claude can invoke
+- **WebSocket Client** - Maintains a persistent connection to the Burp extension, forwarding requests and receiving responses
+- **Tool Definitions** - Defines the available tools (`get_proxy_history`, `send_request`, etc.) with their parameters and descriptions
+- **Request/Response Mapping** - Converts MCP tool calls into JSON-RPC requests for Burp, and formats Burp's responses for Claude
+
+#### Burp Extension (Java)
+
+The Burp extension provides access to Burp Suite's capabilities:
+
+- **WebSocket Server** - Listens for connections from the MCP server on a configurable port (default: 8198)
+- **Montoya API Integration** - Uses Burp's official extension API to access proxy history, site maps, scanner, and HTTP request capabilities
+- **Traffic Storage** - Maintains a thread-safe circular buffer of captured HTTP traffic, indexed by domain
+- **RPC Method Handlers** - Implements handlers for each supported operation (get_proxy_history, send_request, start_scan, etc.)
+
+### Communication Flow
+
+1. **User asks Claude** to analyze traffic for a domain
+2. **Claude Code** invokes the `get_proxy_history` MCP tool
+3. **MCP Server** receives the tool call and sends a JSON-RPC request over WebSocket to Burp
+4. **Burp Extension** queries its traffic store and returns matching requests/responses
+5. **MCP Server** formats the response and returns it to Claude Code
+6. **Claude** analyzes the traffic and responds to the user
 
 ## Prerequisites
 
@@ -197,8 +248,6 @@ burpmcp/
 │       ├── server.ts         # MCP server setup
 │       ├── burp-client.ts    # WebSocket client
 │       └── tools/            # MCP tool implementations
-├── CLAUDE.md                 # Claude Code guidance
-├── IMPLEMENTATION_PLAN.md    # Development roadmap
 └── README.md                 # This file
 ```
 
