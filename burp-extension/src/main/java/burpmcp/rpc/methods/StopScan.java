@@ -8,10 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StopScan implements RpcMethod {
-    private final MontoyaApi api;
-
     public StopScan(MontoyaApi api) {
-        this.api = api;
+        // MontoyaApi passed for consistency with other RPC methods but not needed here
     }
 
     @Override
@@ -35,7 +33,7 @@ public class StopScan implements RpcMethod {
         boolean auditStopped = false;
 
         // Stop crawl if present
-        if (taskInfo.hasCrawl() && taskInfo.getCrawl() != null) {
+        if (taskInfo.hasCrawl()) {
             try {
                 taskInfo.getCrawl().delete();
                 crawlStopped = true;

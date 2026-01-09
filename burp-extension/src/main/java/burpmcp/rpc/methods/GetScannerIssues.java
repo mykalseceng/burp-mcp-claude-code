@@ -100,18 +100,16 @@ public class GetScannerIssues implements RpcMethod {
             map.put("definition", definition);
         }
 
-        // Request/Response pairs (limit to avoid huge payloads)
+        // Request/Response pairs (limit to 3 to avoid huge payloads)
         List<Map<String, String>> requestResponses = new ArrayList<>();
-        int maxPairs = 3; // Limit request/response pairs
-        int pairCount = 0;
-        for (var reqResp : issue.requestResponses()) {
-            if (pairCount >= maxPairs) break;
-
+        var reqRespList = issue.requestResponses();
+        int pairsToInclude = Math.min(3, reqRespList.size());
+        for (int i = 0; i < pairsToInclude; i++) {
+            var reqResp = reqRespList.get(i);
             Map<String, String> pair = new HashMap<>();
             pair.put("request", reqResp.request() != null ? truncate(reqResp.request().toString(), 5000) : null);
             pair.put("response", reqResp.response() != null ? truncate(reqResp.response().toString(), 5000) : null);
             requestResponses.add(pair);
-            pairCount++;
         }
         map.put("requestResponses", requestResponses);
 
