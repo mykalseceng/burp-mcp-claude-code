@@ -43,7 +43,8 @@ public class BurpMcpExtension implements BurpExtension {
         messageHandler.registerMethod(new GetScope(api));
         messageHandler.registerMethod(new ModifyScope(api));
         messageHandler.registerMethod(new GetScannerIssues(api));
-        api.logging().logToOutput("Registered 8 RPC methods");
+        messageHandler.registerMethod(new SendToRepeater(api));
+        api.logging().logToOutput("Registered 9 RPC methods");
 
         this.wsServer = new WebSocketServer(
             config.getWebSocketPort(),
