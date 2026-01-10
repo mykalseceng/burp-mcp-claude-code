@@ -53,7 +53,7 @@ public class StopScan implements RpcMethod {
         }
 
         // Remove from active scans
-        StartScan.getActiveScanTasks().remove(scanId);
+        StartScan.removeScanTask(scanId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("scanId", scanId);

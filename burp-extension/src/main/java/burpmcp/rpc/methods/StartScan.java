@@ -89,6 +89,20 @@ public class StartScan implements RpcMethod {
     }
 
     /**
+     * Remove a scan task by ID (call after scan completes or is stopped)
+     */
+    public static void removeScanTask(String scanId) {
+        activeScanTasks.remove(scanId);
+    }
+
+    /**
+     * Clear all scan tasks (call on extension unload)
+     */
+    public static void clearAllScanTasks() {
+        activeScanTasks.clear();
+    }
+
+    /**
      * Holds references to crawl and audit tasks for a scan
      */
     public static class ScanTaskInfo {

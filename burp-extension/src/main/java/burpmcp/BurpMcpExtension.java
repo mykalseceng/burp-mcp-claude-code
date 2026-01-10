@@ -59,5 +59,11 @@ public class BurpMcpExtension implements BurpExtension {
         if (wsServer != null) {
             wsServer.shutdown();
         }
+        // Clear stored data to release memory
+        if (trafficStore != null) {
+            trafficStore.clearAll();
+        }
+        StartScan.clearAllScanTasks();
+        api.logging().logToOutput("BurpMCP cleanup complete");
     }
 }
