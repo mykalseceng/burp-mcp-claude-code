@@ -1,4 +1,4 @@
-# BurpMCP
+# BurpMCP for Claude Code CLI
 
 BurpMCP connects Claude Code to Burp Suite, combining source code analysis with live HTTP traffic inspection. Claude Code already understands your codebase—now it can see actual requests and responses flowing through Burp's proxy, correlate code with runtime behavior, and craft targeted security tests.
 
