@@ -109,6 +109,12 @@ Or with the WebSocket URL explicitly set:
 claude mcp add burp -e BURP_WS_URL=ws://localhost:8198 -- node /absolute/path/to/burpmcp/mcp-server/dist/index.js
 ```
 
+To make the server available globally across all projects (user scope):
+
+```bash
+claude mcp add burp --scope user -- node /absolute/path/to/burpmcp/mcp-server/dist/index.js
+```
+
 Replace `/absolute/path/to/burpmcp` with the actual path to this repository.
 
 To verify it was added:
