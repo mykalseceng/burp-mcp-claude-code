@@ -134,15 +134,70 @@ Once configured, the following tools are available in Claude Code:
 | Tool | Description |
 |------|-------------|
 | `get_proxy_history` | Query HTTP requests/responses captured by Burp proxy for a specific domain |
+| `get_capabilities` | Report Burp edition and runtime feature availability (scanner, collaborator, ai, websockets, etc.) |
+| `get_job_status` | Get async job status/progress by job ID |
+| `list_jobs` | List all async jobs and their progress |
+| `cancel_job` | Cancel an async job |
 | `get_sitemap` | Get discovered endpoints from Burp's site map |
 | `send_request` | Send a custom HTTP request through Burp Suite |
+| `send_http1_request` | Send a raw HTTP/1.1 request to a specific host/service |
+| `send_http2_request` | Send an HTTP/2 request using pseudo-headers and normal headers |
 | `send_to_intruder` | Send an HTTP request to Burp Intruder for fuzzing/brute-force attacks |
 | `start_scan` | Start an active vulnerability scan (Burp Professional only) |
+| `get_scan_status` | Get active scan status by scan/job ID |
 | `stop_scan` | Stop a running scan by ID (Burp Professional only) |
+| `start_crawl` | Start a crawl as an async job (Burp Professional only) |
+| `start_bulk_export` | Start async export job for proxy history or scanner issues |
 | `get_scanner_issues` | Get vulnerability findings from Burp's scanner (Burp Professional only) |
 | `get_scope` | Get the current Burp Suite scope configuration |
 | `modify_scope` | Add or remove a URL from Burp's scope |
 | `send_to_repeater` | Send an HTTP request to Burp Repeater for manual testing |
+| `get_active_editor_contents` | Read the currently focused Burp message editor text |
+| `set_active_editor_contents` | Set text in the currently focused editable Burp message editor |
+| `set_task_execution_engine_state` | Pause or resume Burp's task execution engine |
+| `set_proxy_intercept_state` | Enable or disable Burp Proxy Intercept |
+| `url_encode` | URL-encode an input string |
+| `url_decode` | URL-decode an input string |
+| `base64_encode` | Base64-encode an input string |
+| `base64_decode` | Base64-decode an input string |
+| `generate_random_string` | Generate a random string with length and character set |
+| `get_proxy_websocket_history` | List proxy WebSocket history entries with pagination |
+| `get_proxy_websocket_history_regex` | Filter proxy WebSocket history entries by regex |
+| `export_replay_pack` | Save deterministic replay pack JSON bundle |
+| `run_replay_pack` | Replay requests from a saved replay pack |
+
+### `send_request` payload options
+
+`send_request` accepts either a text body (`body`) or a binary-safe base64 body (`bodyBase64`).
+
+- If both are provided, `bodyBase64` is used.
+- Use `body` for normal JSON/form payloads.
+- Use `bodyBase64` for raw/binary payloads that must be preserved byte-for-byte.
+
+### Async jobs API
+
+Long-running operations return a stable `jobId` immediately and run in the background.
+
+- `start_scan`, `start_crawl`, and `start_bulk_export` return `jobId`.
+- Poll with `get_job_status` (or `get_scan_status` for scan-specific status).
+- Cancel with `cancel_job` or `stop_scan`.
+
+### Event streaming API
+
+The WebSocket server supports JSON-RPC subscriptions for real-time events.
+
+- `subscribe_events` with `eventTypes` (supports `*` and prefixes like `proxy.*`)
+- `unsubscribe_events`
+- `get_event_subscriptions`
+
+Supported event types include:
+
+- `proxy.request.captured`
+- `scanner.issue.created`
+- `websocket.created`
+- `websocket.message.captured`
+
+Events are delivered as JSON-RPC notifications with `method: "event"`.
 
 ## Usage Examples
 

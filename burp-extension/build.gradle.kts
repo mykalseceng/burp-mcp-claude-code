@@ -13,6 +13,7 @@ dependencies {
     compileOnly("net.portswigger.burp.extensions:montoya-api:2025.10")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.java-websocket:Java-WebSocket:1.5.6")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 }
 
 java {
@@ -27,4 +28,8 @@ tasks.jar {
         attributes["Implementation-Title"] = "BurpMCP"
         attributes["Implementation-Version"] = version
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

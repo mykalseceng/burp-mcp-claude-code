@@ -8,16 +8,16 @@ import com.google.gson.JsonObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StopScan implements RpcMethod {
+public class GetScanStatus implements RpcMethod {
     private final JobManager jobManager;
 
-    public StopScan(JobManager jobManager) {
+    public GetScanStatus(JobManager jobManager) {
         this.jobManager = jobManager;
     }
 
     @Override
     public String getName() {
-        return "stop_scan";
+        return "get_scan_status";
     }
 
     @Override
@@ -29,20 +29,17 @@ public class StopScan implements RpcMethod {
             jobId = params.get("scanId").getAsString();
         }
 
-        if (jobId == null || jobId.isEmpty()) {
+        if (jobId == null || jobId.isBlank()) {
             throw new RpcException(RpcException.INVALID_PARAMS, "jobId or scanId parameter required");
         }
 
-        boolean cancelled = jobManager.cancel(jobId);
-        if (!cancelled) {
+        Map<String, Object> status = jobManager.status(jobId);
+        if (status == null) {
             throw new RpcException(RpcException.INVALID_PARAMS, "No scan job found with ID: " + jobId);
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("jobId", jobId);
-        result.put("scanId", jobId);
-        result.put("stopped", true);
-        result.put("message", "Scan job cancelled: " + jobId);
-        return result;
+        Map<String, Object> out = new HashMap<>(status);
+        out.put("scanId", jobId);
+        return out;
     }
 }

@@ -2,6 +2,7 @@ package burpmcp.rpc.methods;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.core.Annotations;
+import burp.api.montoya.core.ByteArray;
 import burp.api.montoya.core.HighlightColor;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
@@ -10,6 +11,7 @@ import burpmcp.rpc.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ public class SendRequest implements RpcMethod {
 
         String method = params.has("method") ? params.get("method").getAsString() : "GET";
         String body = params.has("body") ? params.get("body").getAsString() : "";
+        String bodyBase64 = params.has("bodyBase64") ? params.get("bodyBase64").getAsString() : "";
         boolean addToSiteMap = params.has("addToSiteMap") && params.get("addToSiteMap").getAsBoolean();
         String source = params.has("source") ? params.get("source").getAsString() : "Claude Code";
 
@@ -47,7 +50,14 @@ public class SendRequest implements RpcMethod {
             }
         }
 
-        if (!body.isEmpty()) {
+        if (!bodyBase64.isEmpty()) {
+            try {
+                byte[] decodedBody = Base64.getDecoder().decode(bodyBase64);
+                request = request.withBody(ByteArray.byteArray(decodedBody));
+            } catch (IllegalArgumentException e) {
+                throw new RpcException(RpcException.INVALID_PARAMS, "invalid bodyBase64 payload");
+            }
+        } else if (!body.isEmpty()) {
             request = request.withBody(body);
         }
 
