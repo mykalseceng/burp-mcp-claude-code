@@ -5,7 +5,9 @@ import burp.api.montoya.http.handler.*;
 import burp.api.montoya.http.message.HttpHeader;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burpmcp.config.ExtensionConfig;
+import burpmcp.events.EventBus;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -13,11 +15,13 @@ public class TrafficHttpHandler implements HttpHandler {
     private final MontoyaApi api;
     private final TrafficStore store;
     private final ExtensionConfig config;
+    private final EventBus eventBus;
 
-    public TrafficHttpHandler(MontoyaApi api, TrafficStore store, ExtensionConfig config) {
+    public TrafficHttpHandler(MontoyaApi api, TrafficStore store, ExtensionConfig config, EventBus eventBus) {
         this.api = api;
         this.store = store;
         this.config = config;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -45,7 +49,16 @@ public class TrafficHttpHandler implements HttpHandler {
                 .mimeType(response.mimeType().toString())
                 .toolSource(response.toolSource().toolType().toString());
 
-            store.store(builder);
+            long storedId = store.store(builder);
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("id", storedId);
+            payload.put("url", request.url());
+            payload.put("host", request.httpService().host());
+            payload.put("method", request.method());
+            payload.put("statusCode", response.statusCode());
+            payload.put("toolSource", response.toolSource().toolType().toString());
+            eventBus.publish("proxy.request.captured", payload);
 
         } catch (Exception e) {
             api.logging().logToError("Error storing request: " + e.getMessage());
