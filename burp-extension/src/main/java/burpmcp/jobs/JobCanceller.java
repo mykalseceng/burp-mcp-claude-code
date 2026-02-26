@@ -2,5 +2,5 @@ package burpmcp.jobs;
 
 @FunctionalInterface
 public interface JobCanceller {
-    void cancel() throws Exception;
+    void cancel(String jobId) throws Exception;
 }

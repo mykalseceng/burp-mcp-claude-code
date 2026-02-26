@@ -9,12 +9,13 @@ import burpmcp.rpc.RpcMethod;
 import com.google.gson.JsonObject;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class StartCrawl implements RpcMethod {
     private final MontoyaApi api;
     private final JobManager jobManager;
+    private static final Map<String, Crawl> crawlTasksByJobId = new ConcurrentHashMap<>();
 
     public StartCrawl(MontoyaApi api, JobManager jobManager) {
         this.api = api;
@@ -39,50 +40,88 @@ public class StartCrawl implements RpcMethod {
             throw new RpcException(RpcException.INVALID_PARAMS, "url parameter required");
         }
 
+        int idleLimitTmp = params.has("idleLimitSeconds") ? params.get("idleLimitSeconds").getAsInt() : 120;
+        int maxRuntimeTmp = params.has("maxRuntimeSeconds") ? params.get("maxRuntimeSeconds").getAsInt() : 300;
+        if (idleLimitTmp < 10) {
+            idleLimitTmp = 10;
+        }
+        if (maxRuntimeTmp < idleLimitTmp) {
+            maxRuntimeTmp = idleLimitTmp;
+        }
+        final int idleLimitSeconds = idleLimitTmp;
+        final int maxRuntimeSeconds = maxRuntimeTmp;
+
         String jobId = jobManager.submit("crawl", ctx -> {
             ctx.setStage("starting");
             ctx.setProgress(5);
+            String currentJobId = String.valueOf(ctx.getDetail("jobId"));
+            ctx.putDetail("idleLimitSeconds", idleLimitSeconds);
+            ctx.putDetail("maxRuntimeSeconds", maxRuntimeSeconds);
 
             Crawl crawl = api.scanner().startCrawl(CrawlConfiguration.crawlConfiguration(url));
-            ctx.setStage("running");
-            ctx.setProgress(15);
+            crawlTasksByJobId.put(currentJobId, crawl);
+            try {
+                ctx.setStage("running");
+                ctx.setProgress(15);
 
-            int idle = 0;
-            int lastCount = -1;
-            while (!ctx.isCancelled()) {
-                int count = crawl.requestCount();
-                ctx.putDetail("requestCount", count);
-                ctx.putDetail("errorCount", crawl.errorCount());
-                String status = crawl.statusMessage() == null ? "" : crawl.statusMessage();
-                ctx.putDetail("statusMessage", status);
+                int idle = 0;
+                int lastCount = -1;
+                int activeLoops = 0;
+                while (!ctx.isCancelled()) {
+                    int count = crawl.requestCount();
+                    ctx.putDetail("requestCount", count);
+                    ctx.putDetail("errorCount", crawl.errorCount());
+                    ctx.putDetail("statusMessage", "");
 
-                if (count == lastCount) {
-                    idle++;
-                } else {
-                    idle = 0;
+                    if (count == lastCount) {
+                        idle++;
+                    } else {
+                        idle = 0;
+                    }
+                    lastCount = count;
+                    activeLoops++;
+
+                    if (activeLoops >= maxRuntimeSeconds) {
+                        break;
+                    }
+
+                    if (idle >= idleLimitSeconds) {
+                        break;
+                    }
+
+                    ctx.setProgress(Math.min(95, 15 + count));
+                    Thread.sleep(1000);
                 }
-                lastCount = count;
 
-                String lower = status.toLowerCase(Locale.ROOT);
-                if (lower.contains("complete") || lower.contains("finished") || idle >= 8) {
-                    break;
+                if (ctx.isCancelled()) {
+                    try { crawl.delete(); } catch (Exception ignored) {}
+                    throw new InterruptedException("crawl cancelled");
                 }
 
-                ctx.setProgress(Math.min(95, 15 + count));
-                Thread.sleep(1000);
-            }
-
-            if (ctx.isCancelled()) {
+                // Ensure no background crawl remains once we mark this job complete.
                 try { crawl.delete(); } catch (Exception ignored) {}
-                throw new InterruptedException("crawl cancelled");
-            }
 
-            ctx.setProgress(100);
-            Map<String, Object> out = new HashMap<>();
-            out.put("targetUrl", url);
-            out.put("requestCount", crawl.requestCount());
-            out.put("errorCount", crawl.errorCount());
-            return out;
+                if (crawl.requestCount() == 0) {
+                    throw new IllegalStateException(
+                        "Crawl completed with zero requests after " + activeLoops + "s (idleLimit=" + idleLimitSeconds + "s, maxRuntime=" + maxRuntimeSeconds + "s)"
+                    );
+                }
+
+                ctx.setProgress(100);
+                Map<String, Object> out = new HashMap<>();
+                out.put("targetUrl", url);
+                out.put("requestCount", crawl.requestCount());
+                out.put("errorCount", crawl.errorCount());
+                return out;
+            } finally {
+                crawlTasksByJobId.remove(currentJobId);
+            }
+        }, cancelJobId -> {
+            Crawl crawl = crawlTasksByJobId.get(cancelJobId);
+            if (crawl != null) {
+                try { crawl.delete(); } catch (Exception ignored) {}
+            }
+            crawlTasksByJobId.remove(cancelJobId);
         });
 
         Map<String, Object> result = new HashMap<>();
@@ -90,5 +129,9 @@ public class StartCrawl implements RpcMethod {
         result.put("status", "queued");
         result.put("targetUrl", url);
         return result;
+    }
+
+    public static void clearAllCrawlTasks() {
+        crawlTasksByJobId.clear();
     }
 }

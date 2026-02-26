@@ -34,6 +34,7 @@ public class JobManager {
 
         AtomicBoolean cancelled = new AtomicBoolean(false);
         JobContext context = new JobContext(cancelled);
+        context.putDetail("jobId", jobId);
         JobEntry entry = new JobEntry(jobId, safeType, context, canceller);
         jobs.put(jobId, entry);
 
@@ -102,7 +103,7 @@ public class JobManager {
 
         if (entry.canceller != null) {
             try {
-                entry.canceller.cancel();
+                entry.canceller.cancel(jobId);
             } catch (Exception ignored) {
             }
         }

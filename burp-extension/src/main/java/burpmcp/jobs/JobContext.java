@@ -47,6 +47,13 @@ public class JobContext {
         }
     }
 
+    public Object getDetail(String key) {
+        if (key == null) {
+            return null;
+        }
+        return details.get(key);
+    }
+
     public Map<String, Object> detailsSnapshot() {
         return Map.copyOf(details);
     }

@@ -108,6 +108,7 @@ public class BurpMcpExtension implements BurpExtension {
             jobManager.shutdown();
         }
         StartScan.clearAllScanTasks();
+        StartCrawl.clearAllCrawlTasks();
         api.logging().logToOutput("BurpMCP cleanup complete");
     }
 }
