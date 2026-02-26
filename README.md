@@ -4,6 +4,8 @@ BurpMCP connects Claude Code to Burp Suite, combining source code analysis with 
 
 Built on MCP (Model Context Protocol), BurpMCP enables Claude to analyze captured traffic, send custom requests, explore sitemaps, and trigger vulnerability scans.
 
+> Note: `v1.2.0` is an experimental release focused on powering the `agent-burp` workflow for LLM-driven testing and automation.
+
 ## Why This Architecture?
 
 Claude Code cannot directly interact with Burp Suite for several reasons:
@@ -76,14 +78,14 @@ cd burp-extension
 ./gradlew build
 ```
 
-The JAR file will be created at `build/libs/burp-mcp-extension-1.0.0.jar`.
+The JAR file will be created at `build/libs/burp-mcp-extension-1.2.0.jar`.
 
 ### 2. Load Extension in Burp Suite
 
 1. Open Burp Suite
 2. Go to **Extensions** > **Installed**
 3. Click **Add**
-4. Select the JAR file: `burp-extension/build/libs/burp-mcp-extension-1.0.0.jar`
+4. Select the JAR file: `burp-extension/build/libs/burp-mcp-extension-1.2.0.jar`
 5. Verify "BurpMCP" appears in the extensions list
 6. Check the **Output** tab for "BurpMCP extension loaded"
 
