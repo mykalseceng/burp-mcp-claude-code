@@ -40,12 +40,16 @@ public class StartCrawl implements RpcMethod {
             throw new RpcException(RpcException.INVALID_PARAMS, "url parameter required");
         }
 
-        int idleLimitTmp = params.has("idleLimitSeconds") ? params.get("idleLimitSeconds").getAsInt() : 120;
-        int maxRuntimeTmp = params.has("maxRuntimeSeconds") ? params.get("maxRuntimeSeconds").getAsInt() : 300;
+        int idleLimitTmp = params.has("idleLimitSeconds") ? params.get("idleLimitSeconds").getAsInt() : 1800;
+        int maxRuntimeTmp = params.has("maxRuntimeSeconds") ? params.get("maxRuntimeSeconds").getAsInt() : 86400;
         if (idleLimitTmp < 10) {
             idleLimitTmp = 10;
         }
-        if (maxRuntimeTmp < idleLimitTmp) {
+        // Allow maxRuntimeSeconds=0 to mean "no hard runtime limit".
+        if (maxRuntimeTmp < 0) {
+            maxRuntimeTmp = 0;
+        }
+        if (maxRuntimeTmp > 0 && maxRuntimeTmp < idleLimitTmp) {
             maxRuntimeTmp = idleLimitTmp;
         }
         final int idleLimitSeconds = idleLimitTmp;
@@ -81,7 +85,7 @@ public class StartCrawl implements RpcMethod {
                     lastCount = count;
                     activeLoops++;
 
-                    if (activeLoops >= maxRuntimeSeconds) {
+                    if (maxRuntimeSeconds > 0 && activeLoops >= maxRuntimeSeconds) {
                         break;
                     }
 
