@@ -63,6 +63,13 @@ public class BurpMcpExtension implements BurpExtension {
         messageHandler.registerMethod(new GetProxyHistory(trafficStore));
         messageHandler.registerMethod(new GetSitemap(api));
         messageHandler.registerMethod(new SendRequest(api));
+        messageHandler.registerMethod(new SendHttp1Request(api));
+        messageHandler.registerMethod(new SendHttp2Request(api));
+        messageHandler.registerMethod(new UrlEncode(api));
+        messageHandler.registerMethod(new UrlDecode(api));
+        messageHandler.registerMethod(new Base64Encode(api));
+        messageHandler.registerMethod(new Base64Decode(api));
+        messageHandler.registerMethod(new GenerateRandomString(api));
         messageHandler.registerMethod(new StartScan(api, jobManager));
         messageHandler.registerMethod(new GetScanStatus(jobManager));
         messageHandler.registerMethod(new StopScan(jobManager));
@@ -74,12 +81,18 @@ public class BurpMcpExtension implements BurpExtension {
         messageHandler.registerMethod(new GetScope(api));
         messageHandler.registerMethod(new ModifyScope(api));
         messageHandler.registerMethod(new GetScannerIssues(api));
+        messageHandler.registerMethod(new GetProxyWebsocketHistory(api));
+        messageHandler.registerMethod(new GetProxyWebsocketHistoryRegex(api));
         messageHandler.registerMethod(new SendToRepeater(api));
         messageHandler.registerMethod(new SendToIntruder(api));
+        messageHandler.registerMethod(new GetActiveEditorContents(api));
+        messageHandler.registerMethod(new SetActiveEditorContents(api));
+        messageHandler.registerMethod(new SetTaskExecutionEngineState(api));
+        messageHandler.registerMethod(new SetProxyInterceptState(api));
         messageHandler.registerMethod(new GetCapabilities(api));
         messageHandler.registerMethod(new ExportReplayPack(api, trafficStore, replayPackService));
         messageHandler.registerMethod(new RunReplayPack(api, replayPackService));
-        api.logging().logToOutput("Registered 19 RPC methods (+3 event subscription RPCs)");
+        api.logging().logToOutput("Registered 32 RPC methods (+3 event subscription RPCs)");
 
         this.wsServer = new WebSocketServer(
             config.getWebSocketPort(),

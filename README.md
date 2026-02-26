@@ -140,6 +140,8 @@ Once configured, the following tools are available in Claude Code:
 | `cancel_job` | Cancel an async job |
 | `get_sitemap` | Get discovered endpoints from Burp's site map |
 | `send_request` | Send a custom HTTP request through Burp Suite |
+| `send_http1_request` | Send a raw HTTP/1.1 request to a specific host/service |
+| `send_http2_request` | Send an HTTP/2 request using pseudo-headers and normal headers |
 | `send_to_intruder` | Send an HTTP request to Burp Intruder for fuzzing/brute-force attacks |
 | `start_scan` | Start an active vulnerability scan (Burp Professional only) |
 | `get_scan_status` | Get active scan status by scan/job ID |
@@ -150,6 +152,17 @@ Once configured, the following tools are available in Claude Code:
 | `get_scope` | Get the current Burp Suite scope configuration |
 | `modify_scope` | Add or remove a URL from Burp's scope |
 | `send_to_repeater` | Send an HTTP request to Burp Repeater for manual testing |
+| `get_active_editor_contents` | Read the currently focused Burp message editor text |
+| `set_active_editor_contents` | Set text in the currently focused editable Burp message editor |
+| `set_task_execution_engine_state` | Pause or resume Burp's task execution engine |
+| `set_proxy_intercept_state` | Enable or disable Burp Proxy Intercept |
+| `url_encode` | URL-encode an input string |
+| `url_decode` | URL-decode an input string |
+| `base64_encode` | Base64-encode an input string |
+| `base64_decode` | Base64-decode an input string |
+| `generate_random_string` | Generate a random string with length and character set |
+| `get_proxy_websocket_history` | List proxy WebSocket history entries with pagination |
+| `get_proxy_websocket_history_regex` | Filter proxy WebSocket history entries by regex |
 | `export_replay_pack` | Save deterministic replay pack JSON bundle |
 | `run_replay_pack` | Replay requests from a saved replay pack |
 
