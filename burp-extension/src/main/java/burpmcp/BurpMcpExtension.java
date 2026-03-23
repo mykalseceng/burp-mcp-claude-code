@@ -92,7 +92,10 @@ public class BurpMcpExtension implements BurpExtension {
         messageHandler.registerMethod(new GetCapabilities(api));
         messageHandler.registerMethod(new ExportReplayPack(api, trafficStore, replayPackService));
         messageHandler.registerMethod(new RunReplayPack(api, replayPackService));
-        api.logging().logToOutput("Registered 32 RPC methods (+3 event subscription RPCs)");
+        messageHandler.registerMethod(new GetProxyHistoryItem(trafficStore));
+        messageHandler.registerMethod(new GetEventLog(eventBus));
+        messageHandler.registerMethod(new GetProxyInterceptState(api));
+        api.logging().logToOutput("Registered 35 RPC methods (+3 event subscription RPCs)");
 
         this.wsServer = new WebSocketServer(
             config.getWebSocketPort(),

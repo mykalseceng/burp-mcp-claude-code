@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.burpmcp"
-version = "1.0.0"
+version = "1.3.0"
 
 repositories {
     mavenCentral()
