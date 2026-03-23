@@ -1,8 +1,12 @@
 # BurpMCP for Claude Code CLI
 
+This project is based on PortSwigger's official MCP work at [PortSwigger/mcp-server](https://github.com/PortSwigger/mcp-server), and explores experimental alternative setups oriented toward agent-first CLI workflows.
+
 BurpMCP connects Claude Code to Burp Suite, combining source code analysis with live HTTP traffic inspection. Claude Code already understands your codebase—now it can see actual requests and responses flowing through Burp's proxy, correlate code with runtime behavior, and craft targeted security tests.
 
 Built on MCP (Model Context Protocol), BurpMCP enables Claude to analyze captured traffic, send custom requests, explore sitemaps, and trigger vulnerability scans.
+
+> Note: `v1.2.0` is an experimental release focused on powering the `agent-burp` workflow for LLM-driven testing and automation.
 
 ## Why This Architecture?
 
@@ -76,14 +80,14 @@ cd burp-extension
 ./gradlew build
 ```
 
-The JAR file will be created at `build/libs/burp-mcp-extension-1.0.0.jar`.
+The JAR file will be created at `build/libs/burp-mcp-extension-1.2.0.jar`.
 
 ### 2. Load Extension in Burp Suite
 
 1. Open Burp Suite
 2. Go to **Extensions** > **Installed**
 3. Click **Add**
-4. Select the JAR file: `burp-extension/build/libs/burp-mcp-extension-1.0.0.jar`
+4. Select the JAR file: `burp-extension/build/libs/burp-mcp-extension-1.2.0.jar`
 5. Verify "BurpMCP" appears in the extensions list
 6. Check the **Output** tab for "BurpMCP extension loaded"
 
