@@ -63,6 +63,17 @@ public class TrafficStore {
         return queue == null ? 0 : queue.size();
     }
 
+    public StoredRequest getById(long id) {
+        for (ConcurrentLinkedDeque<StoredRequest> queue : requestsByDomain.values()) {
+            for (StoredRequest request : queue) {
+                if (request.getId() == id) {
+                    return request;
+                }
+            }
+        }
+        return null;
+    }
+
     public void clearDomain(String domain) {
         requestsByDomain.remove(domain.toLowerCase());
     }

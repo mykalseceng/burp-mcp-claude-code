@@ -20,6 +20,7 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
         this.subscriptionManager = subscriptionManager;
         this.authToken = authToken;
         setReuseAddr(true);
+        setConnectionLostTimeout(30);
     }
 
     @Override
